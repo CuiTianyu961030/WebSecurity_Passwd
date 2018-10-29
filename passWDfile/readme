@@ -1,0 +1,9 @@
+相关文件
+yahooPass.txt----雅虎数据库的密码，一行一个
+csdnPass.txt-----csdn数据库的密码，一行一个
+allPass.txt---所有数据库的密码，一行一个
+
+passwd_alpha.txt----密码中的字母串概率文件
+passwd_char.txt----密码中的其他字符概率文件
+passwd_digit.txt----密码中的数字字符串概率文件
+passwd_struct.txt----密码的结构概率文件
