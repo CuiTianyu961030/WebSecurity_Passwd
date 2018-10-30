@@ -7,3 +7,8 @@ passwd_alpha.txt----密码中的字母串概率文件（已更新）
 passwd_char.txt----密码中的其他字符概率文件（已更新）
 passwd_digit.txt----密码中的数字字符串概率文件（已更新）
 passwd_struct.txt----密码的结构概率文件（已更新）
+
+passwd_ADDalpha.txt----将密码中的字母串概率转化为0-1的上界值  0.999999999973061
+passwd_ADDchar.txt----将密码中的其他字符概率转化为0-1的上界值 0.9996359074555853
+passwd_ADDdigit.txt----将密码中的数字字符串概率转化为0-1的上界值 0.9999999999589083
+passwd_ADDstruct.txt----将密码中的结构概率转化为0-1的上界值 1.0000000000006233
