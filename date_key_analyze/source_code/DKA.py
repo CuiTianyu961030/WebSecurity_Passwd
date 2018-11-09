@@ -678,9 +678,9 @@ if __name__ == '__main__':
 
     #载入原始密码库
     csdn_file = "www.csdn.net.sql"
-    #csdn_name,csdn_pwd,csdn_mail = load_csdn_key(csdn_file)
+    csdn_name,csdn_pwd,csdn_mail = load_csdn_key(csdn_file)
     yahoo_file = "plaintxt_yahoo.txt"
-    #yahoo_name,yahoo_pwd = load_yahoo_key(yahoo_file)
+    yahoo_name,yahoo_pwd = load_yahoo_key(yahoo_file)
 
     #记录符合日期密码模式的密码
     print("Date key mode:")
@@ -690,10 +690,10 @@ if __name__ == '__main__':
     csdn_date_pwd_dataset_file = "csdn_date_pwd_dataset.txt"
     yahoo_date_pwd_dataset_file = "yahoo_date_pwd_dataset.txt"
 
-    #csdn_datekey_number = Date_Password_Statistics(csdn_pwd,csdn_date_pwd_dataset_file,"csdn")
-    #yahoo_datekey_number = Date_Password_Statistics(yahoo_pwd,yahoo_date_pwd_dataset_file,"yahoo")
-    #print("csdn date_key dataset:%s",csdn_datekey_number/len(csdn_pwd))
-    #print("yahoo data_key dataset:%s",yahoo_datekey_number/len(yahoo_pwd))
+    csdn_datekey_number = Date_Password_Statistics(csdn_pwd,csdn_date_pwd_dataset_file,"csdn")
+    yahoo_datekey_number = Date_Password_Statistics(yahoo_pwd,yahoo_date_pwd_dataset_file,"yahoo")
+    print("csdn date_key dataset:%s",csdn_datekey_number/len(csdn_pwd))
+    print("yahoo data_key dataset:%s",yahoo_datekey_number/len(yahoo_pwd))
 
     #记录口令结构及概率
     csdn_key_struct_file = "csdn_struct.txt"
@@ -701,8 +701,8 @@ if __name__ == '__main__':
     # 记录口令结构中具体内容概率
     csdn_data_element_file = "csdn_element.txt"
     yahoo_data_element_file = "yahoo_element.txt"
-    #Date_pwd_struct_statistics(csdn_datekey_number,csdn_date_pwd_dataset_file,csdn_key_struct_file,csdn_data_element_file,"csdn")
-    #Date_pwd_struct_statistics(yahoo_datekey_number,yahoo_date_pwd_dataset_file,yahoo_key_struct_file,yahoo_data_element_file,"yahoo")
+    Date_pwd_struct_statistics(csdn_datekey_number,csdn_date_pwd_dataset_file,csdn_key_struct_file,csdn_data_element_file,"csdn")
+    Date_pwd_struct_statistics(yahoo_datekey_number,yahoo_date_pwd_dataset_file,yahoo_key_struct_file,yahoo_data_element_file,"yahoo")
 
     #应用PCFG算法生成攻击字典
     generate_pwd_number = 10
