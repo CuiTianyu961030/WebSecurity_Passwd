@@ -5,6 +5,8 @@ version:1.0
 description:analyze date key and create a dic using pcfg
 '''
 import re
+import numpy as np
+import time
 
 special_cha = "[\.\s\/\|\_\-]"
 #modes in date pwd
@@ -43,11 +45,9 @@ def is_num(s):
     return False
 
 def load_csdn_key(filename):
-    #username # pwd # email
-    user = []
+    user = []#username # pwd # email
     pwd = []
     mail = []
-
     print("loading csdn key_file...")
     f = open(filename,'r',encoding="ISO-8859-1")
     for info in f:
@@ -590,17 +590,97 @@ def Date_pwd_struct_statistics(pwd,dk_dataset,struct_file,data_part_file,dataset
     f.close()
     print(dataset_type+"Analyze over.")
 
-
     return 0
+
+def random_select(struct_list, probability_list):
+    # 生成概率选择空间
+    space_list = []
+    space_begin = 0
+    for probability in probability_list:
+        space_list.append(space_begin)
+        space_begin += probability
+
+    # 随机选取概率
+    random_point = space_begin * np.random.random()
+
+    selected_str = ""
+    for i in range(0, len(space_list)):
+        if space_begin > random_point >= space_list[len(space_list) - 1]:
+            selected_str = struct_list[len(space_list) - 1]
+            break
+        elif space_list[i + 1] > random_point >= space_list[i]:
+            selected_str = struct_list[i]
+            break
+    return selected_str
+
+def Generate_dict(struct_file,element_file):
+    '''
+    根据PCFG算法，依据结构概率生成日期字典
+    :param struct_file:
+    :return:
+    '''
+    struct_list = []
+    struct_probability_list = []
+    f = open(struct_file,"r",encoding="ISO-8859-1")
+    for info in f:
+        if struct_list == []:
+            struct_list.append(0)
+            continue
+        if struct_list[0] == 0:
+            del struct_list[0]
+        struct_list.append(info.split(" # ")[0])
+        struct_probability_list.append(float(info.split(" # ")[-1][:-1]))
+    f.close()
+
+    selected_struct = random_select(struct_list,struct_probability_list)
+
+    generated_pwd = ""
+    #获取结构内容进行选取
+    #每个子结构如L2先进行判别，再将内容及概率进行传递选取
+    element_struct = []
+    element_data = []
+    element_probability = []
+
+    f = open(element_file,'r',encoding="ISO-8859-1")
+    for info in f:
+        if element_struct == []:
+            element_struct.append(0)
+            continue
+        if element_struct[0] == 0:
+            del element_struct[0]
+        element_struct.append(info.split(" # ")[1])
+        element_data.append(info.split(" # ")[0])
+        element_probability.append(float(info.split(" # ")[-1][:-1]))
+    f.close()
+
+    #识别选择的结构的组成
+    patern = "[LDSR]\d{1,2}"
+    c_patern = re.compile(patern)
+    struct_part = c_patern.findall(selected_struct)#每个子结构
+    for struct_type in struct_part:
+        #需要把同种结构内容取出
+        select_data_list = []
+        select_probability_list = []
+        for i in range(len(element_struct)):
+            if element_struct[i] == struct_type:
+                select_data_list.append(element_data[i])
+                select_probability_list.append(element_probability[i])
+        #index = element_struct.index(struct_type)
+        #temp1 = element_data[index]
+        #temp2 = element_probability[index]
+        generated_pwd += random_select(select_data_list,select_probability_list)
+
+    return generated_pwd
 
 if __name__ == '__main__':
     print("Begin Analyze key_file!")
+    start_time = time.time()
 
     #载入原始密码库
     csdn_file = "www.csdn.net.sql"
-    csdn_name,csdn_pwd,csdn_mail = load_csdn_key(csdn_file)
+    #csdn_name,csdn_pwd,csdn_mail = load_csdn_key(csdn_file)
     yahoo_file = "plaintxt_yahoo.txt"
-    yahoo_name,yahoo_pwd = load_yahoo_key(yahoo_file)
+    #yahoo_name,yahoo_pwd = load_yahoo_key(yahoo_file)
 
     #记录符合日期密码模式的密码
     print("Date key mode:")
@@ -610,19 +690,47 @@ if __name__ == '__main__':
     csdn_date_pwd_dataset_file = "csdn_date_pwd_dataset.txt"
     yahoo_date_pwd_dataset_file = "yahoo_date_pwd_dataset.txt"
 
-    csdn_datekey_number = Date_Password_Statistics(csdn_pwd,csdn_date_pwd_dataset_file,"csdn")
-    yahoo_datekey_number = Date_Password_Statistics(yahoo_pwd,yahoo_date_pwd_dataset_file,"yahoo")
-    print("csdn date_key dataset:%s",csdn_datekey_number/len(csdn_pwd))
-    print("yahoo data_key dataset:%s",yahoo_datekey_number/len(yahoo_pwd))
+    #csdn_datekey_number = Date_Password_Statistics(csdn_pwd,csdn_date_pwd_dataset_file,"csdn")
+    #yahoo_datekey_number = Date_Password_Statistics(yahoo_pwd,yahoo_date_pwd_dataset_file,"yahoo")
+    #print("csdn date_key dataset:%s",csdn_datekey_number/len(csdn_pwd))
+    #print("yahoo data_key dataset:%s",yahoo_datekey_number/len(yahoo_pwd))
 
     #记录口令结构及概率
     csdn_key_struct_file = "csdn_struct.txt"
-    yahoo_key_struct_file = "yahoo_stauct.txt"
+    yahoo_key_struct_file = "yahoo_struct.txt"
     # 记录口令结构中具体内容概率
     csdn_data_element_file = "csdn_element.txt"
     yahoo_data_element_file = "yahoo_element.txt"
-    Date_pwd_struct_statistics(len(csdn_pwd),csdn_date_pwd_dataset_file,csdn_key_struct_file,csdn_data_element_file,"csdn")
-    Date_pwd_struct_statistics(len(yahoo_pwd),yahoo_date_pwd_dataset_file,yahoo_key_struct_file,yahoo_data_element_file,"yahoo")
+    #Date_pwd_struct_statistics(csdn_datekey_number,csdn_date_pwd_dataset_file,csdn_key_struct_file,csdn_data_element_file,"csdn")
+    #Date_pwd_struct_statistics(yahoo_datekey_number,yahoo_date_pwd_dataset_file,yahoo_key_struct_file,yahoo_data_element_file,"yahoo")
 
     #应用PCFG算法生成攻击字典
+    generate_pwd_number = 10
+
+    generation_csdn_passwd_dict_path = "generation_csdn_date_passwd_dict.txt"
+    generation_yahoo_passwd_dict_path = "generation_yahoo_date_passwd_dict.txt"
+
+    print("Generating csdn passwd dict...")
+    csdn_passwd_dict = open(generation_csdn_passwd_dict_path, "w")
+    for i in range(generate_pwd_number):
+        print("Round %s generating..." % (i+1))
+        generated_passwd = Generate_dict(csdn_key_struct_file,csdn_data_element_file)
+        csdn_passwd_dict.write(generated_passwd + "\n")
+    csdn_passwd_dict.close()
+
+    print("Generating yahoo passwd dict...")
+    yahoo_passwd_dict = open(generation_yahoo_passwd_dict_path, "w")
+    for i in range(generate_pwd_number):
+        print("Round %s generating..." % (i+1))
+        generated_passwd = Generate_dict(yahoo_key_struct_file,yahoo_data_element_file)
+        yahoo_passwd_dict.write(generated_passwd + "\n")
+    yahoo_passwd_dict.close()
+
+    end_time = time.time()
+    if (end_time - start_time) > 3600:
+        print("Cost time:%s hours"%((end_time - start_time)/3600))
+    else:
+        print("Cost time:%s seconds"%(end_time - start_time))
+    print("Date password dictionary finished !")
+
 
