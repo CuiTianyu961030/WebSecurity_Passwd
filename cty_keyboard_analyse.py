@@ -12,6 +12,7 @@ CSDN and Yahoo password dictionaries.
 For more information see https://github.com/CuiTianyu961030/WebSecurity_Passwd.
 """
 
+import sys
 import re
 import numpy as np
 
@@ -102,6 +103,8 @@ def keyboard_hobby_analyse(passwd, result_filename, dataset_filename):
     # 44-47 right little finger
     # 48-53 little keyboard
     # 54-57 26 English characters
+    # 58-101 Reverse fingering order
+    # 102-107 Random keyboard line combination
 
     pattern = [
         "`1234567890-=",
@@ -174,7 +177,69 @@ def keyboard_hobby_analyse(passwd, result_filename, dataset_filename):
         "abcdefghijklmnopqrstuvwxyz",
         "zyxwvutsrqponmlkjihgfedcba",
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-        "ZYXWVUTSRQPONMLKJIHGFEDCBA"
+        "ZYXWVUTSRQPONMLKJIHGFEDCBA",
+
+        "`12q3wa",
+        "aw3q21`",
+        "~!@Q#WA",
+        "AW#Q@!~",
+
+        "zse4",
+        "4esz",
+        "ZSE$",
+        "$ESZ",
+
+        "xdr5",
+        "5rdx",
+        "XDR%",
+        "%RDX",
+
+        "cft6",
+        "6tfc",
+        "CFT^",
+        "^TFC",
+
+        "vgy7",
+        "7ygv",
+        "VGY&",
+        "&YGV",
+
+        "bhu8",
+        "8uhb",
+        "BHU*",
+        "*UHB",
+
+        "nji9",
+        "9ijn",
+        "NJI(",
+        "(IJN",
+
+        "mko0",
+        "0okm",
+        "MKO)",
+        ")OKM",
+
+        ",lp-",
+        "-pl,",
+        "<LP_",
+        "_PL<",
+
+        ".;[=",
+        "=[;.",
+        ">:{+",
+        "+{:>",
+
+        "/']\\",
+        "\\]'/",
+        "?\"}|",
+        "|}\"?",
+
+        "1q2w3e4r5t6y7u8i9o0p",
+        "1Q2W3E4R5T6Y7U8I9O0P",
+        "1a2s3d4f5g6h7j8k9l0;",
+        "1A2S3D4F5G6H7J8K9L0;",
+        "1z2x3c4v5b6n7m8,9.0/",
+        "1Z2X3C4V5B6N7M8,9.0/"
     ]
 
     print("Keyboard hobby analyse...")
@@ -192,7 +257,9 @@ def keyboard_hobby_analyse(passwd, result_filename, dataset_filename):
         "right ring finger": {},
         "right little finger": {},
         "little keyboard": {},
-        "26 English characters": {}
+        "26 English characters": {},
+        "Reverse fingering order": {},
+        "Random keyboard line combination": {}
     }
 
     # 存储含有键盘模式的键盘口令数据集
@@ -286,6 +353,16 @@ def keyboard_hobby_analyse(passwd, result_filename, dataset_filename):
                         keyword_dict["26 English characters"][longest_common_string] += 1
                     else:
                         keyword_dict["26 English characters"][longest_common_string] = 1
+                elif 58 <= mode_number <= 101:
+                    if longest_common_string in keyword_dict["Reverse fingering order"].keys():
+                        keyword_dict["Reverse fingering order"][longest_common_string] += 1
+                    else:
+                        keyword_dict["Reverse fingering order"][longest_common_string] = 1
+                elif 102 <= mode_number <= 107:
+                    if longest_common_string in keyword_dict["Random keyboard line combination"].keys():
+                        keyword_dict["Random keyboard line combination"][longest_common_string] += 1
+                    else:
+                        keyword_dict["Random keyboard line combination"][longest_common_string] = 1
 
             password_index += 1
 
@@ -679,11 +756,13 @@ if __name__ == "__main__":
     keyboard_structure_analyse(csdn_keyboard_keyword_dataset_path, csdn_keyboard_password_dataset_path, csdn_keyboard_structure_path)
     keyboard_structure_analyse(yahoo_keyboard_keyword_dataset_path, yahoo_keyboard_password_dataset_path, yahoo_keyboard_structure_path)
 
-    structure_element_analyse(csdn_keyboard_password_dataset_path)
-    structure_element_analyse(yahoo_keyboard_password_dataset_path)
 
-    # 生成口令字典容量及口令字典保存路径
-    generate_passwd_number = 10000
+    structure_element_analyse(csdn_keyboard_password_dataset_path)
+    #
+    # # 生成口令字典容量及口令字典保存路径
+    # # generate_passwd_number = 100000
+    generate_passwd_number = sys.argv[1]
+    print(generate_passwd_number)
     generation_csdn_passwd_dict_path = "generation_csdn_keyboard_passwd_dict.txt"
     generation_yahoo_passwd_dict_path = "generation_yahoo_passwd_keyboard_dict.txt"
 
@@ -694,6 +773,8 @@ if __name__ == "__main__":
         generated_passwd = keyboard_passwd_generation(csdn_keyboard_structure_path)
         csdn_passwd_dict.writelines(generated_passwd + "\n")
     csdn_passwd_dict.close()
+
+    structure_element_analyse(yahoo_keyboard_password_dataset_path)
 
     print("Generating yahoo passwd dict...")
     yahoo_passwd_dict = open(generation_yahoo_passwd_dict_path, "w")
