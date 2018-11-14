@@ -145,7 +145,13 @@ optional arguments:
 程序函数结构树：
 
 ``````
-
+main|
+  |load_csdn_key,load_yahoo_key[1]
+  |Date_Password_Statistics[2]
+    |ADK[2.1]
+  |Date_pwd_struct_statistics[3]
+  |Generate_dict[4]
+    random_select[4.1]
 ``````
 
 #### 函数含义
